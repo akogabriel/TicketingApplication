@@ -14,10 +14,10 @@ namespace TicketingApplication
         public Row()
         {
             Seats = new List<Seat>();
-            Seats.Add(new Seat(SeatLabel.A));
-            Seats.Add(new Seat(SeatLabel.B));
-            Seats.Add(new Seat(SeatLabel.C));
-            Seats.Add(new Seat(SeatLabel.D));
+            Seats.Add(new Seat(SeatLabel.A, SeatPosition.W));
+            Seats.Add(new Seat(SeatLabel.B, SeatPosition.A));
+            Seats.Add(new Seat(SeatLabel.C, SeatPosition.A));
+            Seats.Add(new Seat(SeatLabel.D, SeatPosition.W));
 
         }
     }

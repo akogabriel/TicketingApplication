@@ -10,37 +10,47 @@ namespace TicketingApplication
 {
     public class TicketingDriver
     {
+        private List<Row> seatingChart;
+        private int totalSeats;
 
-        public void BookTicket()
+        public TicketingDriver()
         {
-            Console.WriteLine("Please enter the passenger's first name:");
-            string firstName = Console.ReadLine();
+            seatingChart = new List<Row>();
+            totalSeats = 0;
+            InitializeSeatingChart();
+        }
 
-            Console.WriteLine("Please enter the passenger's last name:");
-            string lastName = Console.ReadLine();
-
-            Console.WriteLine("Please enter 1 for a Window seat preference, 2 for an Aisle seat preference, or hit enter to pick the first available seat:");
-            string seatPreference = Console.ReadLine();
-
-            SeatLabel preferredSeat = SeatLabel.A; // Default seat preference in case user hits ENTER
+        private void InitializeSeatingChart()
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                seatingChart.Add(new Row());
+                totalSeats += 4;
+            }
+        }
+        public void BookTicket(string firstName, string lastName, string seatPreference)
+        {
+            SeatLabel preferredSeat = SeatLabel.A; // Default seat preference in case the user hits ENTER
             if (seatPreference == "1")
             {
-                preferredSeat = SeatLabel.A;
+                preferredSeat = SeatLabel.A | SeatLabel.D;
             }
             else if (seatPreference == "2")
             {
-                preferredSeat = SeatLabel.B;
+                preferredSeat = SeatLabel.B | SeatLabel.C;
             }
 
+            //Create the passenger object
             Passenger passenger = new Passenger(firstName, lastName, preferredSeat);
 
-            SeatingChart airlineSeatCharts = new SeatingChart();
-
-            airlineSeatCharts.InitializeSeatingChart();
-
             bool seatFound = false;
-            foreach (Row row in airlineSeatCharts.AirlineSeats)
+
+            int rowNumber = 0;  //default row number
+
+            //Search for preferred seat
+            foreach (Row row in seatingChart)
             {
+                rowNumber++;
                 foreach (Seat seat in row.Seats)
                 {
                     if (!seat.IsBooked)
@@ -58,9 +68,32 @@ namespace TicketingApplication
                 if (seatFound) break;
             }
 
+            if (!seatFound)    //Try to book first seat available since preffered seats are fully booked
+            {
+                foreach (Row row in seatingChart)
+                {
+                    rowNumber = 1;
+                    foreach (Seat seat in row.Seats)
+                    {
+                        if (!seat.IsBooked)
+                        {
+                            if (seat.Label != preferredSeat)
+                            {
+                                seatFound = true;
+                                seat.Passenger = passenger;
+                                seat.IsBooked = true;
+                                passenger.Seat = seat;
+                                break;
+                            }
+                        }
+                    }
+                    if (seatFound) break;
+                }
+            }
+
             if (seatFound)
             {
-                Console.WriteLine($"The seat located in 1 {passenger.Seat.Label} has been booked.");
+                Console.WriteLine($"The seat located in {rowNumber} {passenger.Seat.Label} has been booked.");
             }
             else
             {
@@ -70,18 +103,17 @@ namespace TicketingApplication
 
         public void DisplaySeatingChart()
         {
-            for (int i = 0; i < 12; i++)
+            foreach (Row row in seatingChart)
             {
-                Console.Write($"Row {i + 1}: ");
-                foreach (var seat in SeatingChart[i].Seats)
+                foreach (Seat seat in row.Seats)
                 {
                     if (seat.IsBooked)
                     {
-                        Console.Write($"{seat.Passenger} ({seat.Label}) ");
+                        Console.Write($"{seat.Passenger.Firstname.Substring(0, 1)}{seat.Passenger.Lastname.Substring(0, 1)} ");
                     }
                     else
                     {
-                        Console.Write("Available ");
+                        Console.Write($"{seat.Label} ");
                     }
                 }
                 Console.WriteLine();

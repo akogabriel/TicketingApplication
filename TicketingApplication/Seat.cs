@@ -13,13 +13,15 @@ namespace TicketingApplication
         public bool IsBooked { get; set; }
         public SeatLabel Label { get; set; }
         public Row Row { get; set; }
+        public SeatPosition WindowAisle { get; set; }
 
 
-        public Seat(SeatLabel label)
+        public Seat(SeatLabel label, SeatPosition windowAisle)
         {
             Label = label;
             IsBooked = false;
             Passenger = null;
+            WindowAisle = windowAisle;
         }
     }
 }
